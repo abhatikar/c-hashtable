@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 
 #define HMAP_INITIAL_SIZE (256)
 #define HMAP_CHAIN_LENGTH (8)
@@ -18,7 +19,7 @@ typedef enum _use_state {
 
 /* A element to keep keys and values */
 typedef struct _hashmap_elem_t{
-  char       *key;   /* pointer to actual key storage */
+  unsigned char       *key;   /* pointer to actual key storage */
   use_state   used;  /* unused_0, used_1 */
   void_ptr    data;  /* pointer to value memory allocated by callee */
 } hashmap_elem_t;
@@ -96,7 +97,7 @@ static unsigned long crc32_tab[] = {
 /**
  * Return a 32-bit CRC of the contents of the buffer.
  */
-static unsigned long crc32(const unsigned char *s, unsigned int len)
+static unsigned long crc32(const unsigned char *s, size_t len)
 {
   unsigned int i;
   unsigned long crc32val = 0;
@@ -109,8 +110,8 @@ static unsigned long crc32(const unsigned char *s, unsigned int len)
 /**
  * Hashing function for a string
  */
-static unsigned int _find_hash_index(hashmap_map_t * m, const char* keystring){
-  unsigned long key = crc32(keystring, strlen(keystring));
+static unsigned int _find_hash_index(hashmap_map_t * m, const unsigned char* keystring){
+  unsigned long key = crc32(keystring, strlen((const char*)keystring));
 
   /* Robert Jenkins' 32 bit Mix Function */
   key += (key << 12);
@@ -132,7 +133,7 @@ static unsigned int _find_hash_index(hashmap_map_t * m, const char* keystring){
  * Return the integer of the location in data to store the point to the item,
  *   or HMAP_E_OVERFLOW.
  */
-static int _hashmap_hash(hmap_t in, char* key){
+static int _hashmap_hash(hmap_t in, unsigned char* key){
   int curr;
   int i;
   hashmap_elem_t *elem;
@@ -153,7 +154,7 @@ static int _hashmap_hash(hmap_t in, char* key){
       return curr;
     }
 
-    if(elem->used == used_1 && (!strcmp(elem->key, key))) {
+    if(elem->used == used_1 && (!strcasecmp((const char *)elem->key, (const char *) key))) {
       return curr;
     }
 
@@ -228,7 +229,7 @@ hmap_t hashmap_create() {
 /**
  * Add a pair of key-value to the hashmap
  */
-int hashmap_put(hmap_t in, char* key, void_ptr value){
+int hashmap_put(hmap_t in, unsigned char* key, void_ptr value){
   int index;
   hashmap_map_t *m;
   hashmap_elem_t *elem;
@@ -261,7 +262,7 @@ int hashmap_put(hmap_t in, char* key, void_ptr value){
 /**
  * Get your pointer out of the hashmap with a key
  */
-int hashmap_get(hmap_t in, const char* key, void_ptr *value){
+int hashmap_get(hmap_t in, const unsigned char* key, void_ptr *value){
   int curr;
   int i;
   hashmap_map_t *m;
@@ -273,10 +274,10 @@ int hashmap_get(hmap_t in, const char* key, void_ptr *value){
   curr = _find_hash_index(m, key);
 
   /* Linear probing, if necessary */
-  for (i = 0; i<HMAP_CHAIN_LENGTH; i++){
+  for (i = 0; i < HMAP_CHAIN_LENGTH; i++){
     elem = m->elems + curr;
     if (elem->used == used_1) {
-      if (!strcmp(elem->key, key)) {
+      if (!strcasecmp((const char *) elem->key, (const char *) key)) {
         *value = (elem->data);
         return HMAP_S_OK;
       }
@@ -317,7 +318,7 @@ int hashmap_iterate(hmap_t in, hmap_callback_func fnIterValue, void_ptr arg) {
 /**
  * Remove an element with that key from the map
  */
-int hashmap_remove(hmap_t in, char* key, void_ptr *outValue){
+int hashmap_remove(hmap_t in, unsigned char* key, void_ptr *outValue){
   int i, curr;
   hashmap_map_t* m;
   hashmap_elem_t *elem;
@@ -336,7 +337,7 @@ int hashmap_remove(hmap_t in, char* key, void_ptr *outValue){
   for (i = 0; i<HMAP_CHAIN_LENGTH; i++){
     elem = m->elems + curr;
     if (elem->used == used_1){
-      if (!strcmp(elem->key, key)){
+      if (!strcasecmp((const char *) elem->key, (const char *) key)){
         /* Blank out the fields */
         elem->used = unused_0;
         elem->key = NULL;
