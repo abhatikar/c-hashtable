@@ -3,25 +3,41 @@
 # Run 'make valgrind' to run the test program in Valgrind.
 # Run 'make clean' to remove compiled files.
 
-CC			:= gcc
-CFLAGS			:= -Wall -Wextra -std=c99 -g -D_XOPEN_SOURCE=500
-SRC			:= hashmap.c main.c
-DEPS			:= $(SRC) $(SRC:.c=.h)
-TARGET			:= hashtable
+#LIB source files.
+LIBSRC =  hashmap.c hashmaplib.c
 
-.PHONY: test valgrind submit clean
+LIBOBJ = $(LIBSRC:.c=.o)
 
-default: compile
+LIBOUT = hashtable
 
-compile:
-	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
+#APP source files.
+APPSRC =  hashmaptest.c
+APPOBJ = $(APPSRC:.c=.o)
+APPOUT = hashmaptest
 
-test: compile
-	./hashtable
+# include directories
+INCLUDES = -I. -I/usr/local/include
+
+# C compiler flags (-g -O2 -Wall)
+CCFLAGS = -g -Wall -Wextra -std=c99 -D_XOPEN_SOURCE=500
+
+# compiler
+CCC = gcc
+
+.SUFFIXES: .c
+
+default: $(LIBOUT) $(APPOUT)
+
+.c.o:
+	$(CCC) $(INCLUDES) $(CCFLAGS) -c $< -o $@
+
+$(LIBOUT): $(LIBOBJ)
+	ar rcs lib$(LIBOUT).a $(LIBOBJ)
+
+$(APPOUT): $(APPOBJ)
+	$(CCC) $(CFLAGS) -static $(APPOBJ) -L. -l$(LIBOUT)  -o $(APPOUT)
+clean:
+	rm -f $(APPOBJ) $(APPOUT) $(LIBOBJ) lib$(LIBOUT).a
 
 valgrind:
-	valgrind --tool=memcheck ./hashtable
-
-clean:
-	-rm -f *.o
-	-rm -f $(TARGET) $(SRC:.c)
+	valgrind --tool=memcheck ./$(APPOUT)

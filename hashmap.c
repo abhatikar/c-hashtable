@@ -1,9 +1,8 @@
 /**
  * hashmap.c
- *   Generic hash map implementation.
+ * Generic hash map implementation.
  */
 #include "hashmap.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -16,8 +16,8 @@ extern "C" {
 #define HMAP_S_OK       (0)      /* Success */
 
 /**
- * void_ptr is a pointer. This allows you to put arbitrary structures in the hashmap.
- */
+* void_ptr is a pointer. This allows you to put arbitrary structures in the hashmap.
+*/
 typedef void* void_ptr;
 
 /**
@@ -37,8 +37,8 @@ typedef int (*hmap_callback_func)(void_ptr, void_ptr);
  * prototype for map element type
  */
 typedef struct _hmap_pair_t {
-  unsigned char     *key;
-  void_ptr  data;
+	unsigned char     *key;
+	void_ptr  data;
 } hmap_pair_t;
 
 /**
@@ -54,9 +54,9 @@ extern hmap_t hashmap_create();
 extern int hashmap_iterate(hmap_t in, hmap_callback_func fnIterValue, void_ptr arg);
 
 /**
- * Add an element to the hashmap.
- * Return HMAP_S_OK, HMAP_E_KEYUSED or HMAP_E_OUTMEM.
- */
+   * Add an element to the hashmap.
+   * Return HMAP_S_OK, HMAP_E_KEYUSED or HMAP_E_OUTMEM.
+   */
 extern int hashmap_put(hmap_t in, unsigned char* key, void_ptr elem);
 
 /**

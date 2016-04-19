@@ -8,12 +8,14 @@
 #include <stdlib.h>
 
 #include "hashmap.h"
+#include "hashmaplib.h"
 
 #define UNUSED(expr) do { (void)(expr); } while (0)
 
 typedef struct userelem_t {
   unsigned char   key[20];
   unsigned char  *value;
+  void *value1;
 } userelem;
 
 static int iter_elem(void* elem, void *arg) {
@@ -78,34 +80,4 @@ int get_hashtable_length(hmap_t map){
 int print_hashtable(hmap_t map)
 {
   return hashmap_iterate(map, iter_elem, 0);
-}
-
-
-int main(void)
-{
-	hmap_t map;
-	int ret;
-	int i;
-	unsigned char mac[]="000e1e1013";
-	
-	ret = create_hashtable(&map);
-	assert(ret==HMAP_S_OK);
-
-  	for (i=10; i<100; i++) {
-		sprintf((char*) mac, "000e1e10%d", i);
-		add_mac_in_hashtable(map, mac, i);
-	}
-	printf("Hashtable len=%d\n", get_hashtable_length(map));
-	print_hashtable(map);
-
-	sprintf((char*) mac, "000e1e10%d", 99);
-
-	add_mac_in_hashtable(map, mac, i);
-
-	printf("Hashtable len=%d\n", get_hashtable_length(map));
-	print_hashtable(map);
-
-	delete_hashtable(map);
-
-	return 0;
 }
