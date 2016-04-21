@@ -1,16 +1,7 @@
-/**
- * main.c
- *
- */  
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-
-#include "hashmap.h"
+#include "hashmap_def.h"
 #include "hashmaplib.h"
 
-#define UNUSED(expr) do { (void)(expr); } while (0)
+/* Internal functions */
 
 typedef struct userelem_t {
   unsigned char   key[20];
@@ -39,6 +30,8 @@ static int free_data(void* data, void *arg) {
 	return 0;
 }
 
+/* Library Functions */
+
 int create_hashtable(hmap_t* map)
 {
 	*map = hashmap_create();
@@ -52,8 +45,8 @@ int delete_hashtable(hmap_t map)
 }
 
 
-int add_mac_in_hashtable(hmap_t map, unsigned char* mac, int value){
-
+int add_mac_in_hashtable(hmap_t map, unsigned char* mac, int value)
+{
 	userelem *dat = NULL, *dat1 = NULL;
 	int ret = 0;
 
@@ -73,7 +66,8 @@ int add_mac_in_hashtable(hmap_t map, unsigned char* mac, int value){
 	return ret;
 }
 
-int get_hashtable_length(hmap_t map){
+int get_hashtable_length(hmap_t map)
+{
 	return hashmap_size(map);
 }
 
